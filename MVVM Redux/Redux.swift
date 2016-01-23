@@ -25,20 +25,51 @@ struct State {
 
 }
 
-let mainStore = Store(state: State(), reducer: combineReducers([navigationReducer, masterReducer, detailReducer]), middleware: [])
+extension State {
+	
+	init(dictionary: [String: AnyObject]) {
+		masterState = MasterState(dictionary: dictionary["masterState"] as! [String: AnyObject])
+		if let detail = dictionary["detailState"] as? [String: AnyObject] {
+			detailState = DetailState(dictionary: detail)
+		}
+		navigationState = NavigationState(dictionary: dictionary["navigationState"] as! [String: AnyObject])
+	}
+
+	var dictionary: [String: AnyObject] {
+		var result = [
+			"masterState": masterState.dictionary,
+			"navigationState": navigationState.dictionary
+		]
+		if let detailState = detailState {
+			result["detailState"] = detailState.dictionary
+		}
+		return result
+	}
+}
+
+
+let mainStore = Store(state: createState(), reducer: combineReducers([navigationReducer, masterReducer, detailReducer]), middleware: [logStateMiddleware])
 
 typealias MyStore = Store<State>
 
-func actionLogMiddleware(next: MyStore.Dispatcher, state: () -> State) -> MyStore.Dispatcher {
-	return { action in
-		print(action)
-		next(action: action)
+func createState() -> State {
+	let url = applicationDocumentsDirectory.URLByAppendingPathComponent("state.plist")
+	if let dictionary = NSDictionary(contentsOfURL: url) as? [String: AnyObject] {
+		return State(dictionary: dictionary)
+	}
+	else {
+		return State()
 	}
 }
 
 func logStateMiddleware(next: MyStore.Dispatcher, state: () -> State) -> MyStore.Dispatcher {
 	return { action in
-		print(state())
+		let url = applicationDocumentsDirectory.URLByAppendingPathComponent("state.plist")
+		(state().dictionary as NSDictionary).writeToURL(url, atomically: true)
 		next(action: action)
 	}
+}
+
+var applicationDocumentsDirectory: NSURL {
+	return NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
 }

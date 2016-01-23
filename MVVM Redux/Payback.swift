@@ -28,6 +28,25 @@ struct Payback: Hashable {
 	}
 }
 
+extension Payback {
+	
+	init(dictionary: [String: AnyObject]) {
+		id = dictionary["id"] as! Int
+		firstName = dictionary["firstName"] as! String
+		lastName = dictionary["lastName"] as! String
+		amount = dictionary["amount"] as! Double
+	}
+	
+	var dictionary: [String: AnyObject] {
+		return [
+			"id": id,
+			"firstName": firstName,
+			"lastName": lastName,
+			"amount": amount,
+		]
+	}
+}
+
 func ==(lhs: Payback, rhs: Payback) -> Bool {
 	return lhs.id == rhs.id
 }

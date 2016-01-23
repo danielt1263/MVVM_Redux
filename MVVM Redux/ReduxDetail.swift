@@ -18,9 +18,9 @@ enum DetailAction: Action {
 }
 
 struct DetailState {
-	enum ResponderField {
-		case NameField
-		case AmountField
+    enum ResponderField: Int {
+		case NameField = 0
+		case AmountField = 1
 	}
 	
 	var currentFirstResponder: ResponderField?
@@ -67,6 +67,28 @@ struct DetailState {
 
 	private var nameComponents: [String] {
 		return nameField.componentsSeparatedByString(" ").filter { !$0.isEmpty }
+	}
+}
+
+extension DetailState {
+    
+    init(dictionary: [String: AnyObject]) {
+		if let responder = dictionary["currentFirstResponder"] as? Int {
+			currentFirstResponder = ResponderField(rawValue: responder)
+		}
+        nameField = dictionary["nameField"] as! String
+        amountField = dictionary["amountField"] as! String
+    }
+	
+	var dictionary: [String: AnyObject] {
+		var result: [String: AnyObject] = [
+			"nameField": nameField,
+			"amountField": amountField
+		]
+		if let responder = currentFirstResponder {
+			result["currentFirstResponder"] = responder.rawValue
+		}
+		return result
 	}
 }
 

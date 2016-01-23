@@ -16,11 +16,28 @@ enum MasterAction: Action {
 
 }
 
+
 struct MasterState {
 
 	var paybacks: [Payback] = []
 
 }
+
+
+extension MasterState {
+    
+    init(dictionary: [String: AnyObject]) {
+        let paybackDicts = dictionary["paybacks"]! as! [[String: AnyObject]]
+        paybacks = paybackDicts.map { Payback(dictionary: $0) }
+    }
+
+	var dictionary: [String: AnyObject] {
+		return [
+			"paybacks": paybacks.map { $0.dictionary }
+		]
+	}
+}
+
 
 func masterReducer(var state: State, action: Action) -> State {
 	guard let action = action as? MasterAction else { return state }
