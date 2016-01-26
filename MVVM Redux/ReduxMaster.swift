@@ -19,7 +19,14 @@ enum MasterAction: Action {
 
 struct MasterState {
 
-	var paybacks: [Payback] = []
+	private (set) var paybacks: [Payback] = []
+
+	mutating func addPaybackWithFirstName(firstName: String, lastName: String, amount: Double) {
+		let payback = Payback(id: uniqueId++, firstName: firstName, lastName: lastName, amount: amount)
+		paybacks.append(payback)
+	}
+	
+	private var uniqueId = 0
 
 }
 
@@ -29,11 +36,13 @@ extension MasterState {
     init(dictionary: [String: AnyObject]) {
         let paybackDicts = dictionary["paybacks"]! as! [[String: AnyObject]]
         paybacks = paybackDicts.map { Payback(dictionary: $0) }
+		uniqueId = dictionary["uniqueId"]! as! Int
     }
 
 	var dictionary: [String: AnyObject] {
 		return [
-			"paybacks": paybacks.map { $0.dictionary }
+			"paybacks": paybacks.map { $0.dictionary },
+			"uniqueId": uniqueId
 		]
 	}
 }

@@ -16,13 +16,6 @@ struct State {
 	var detailState: DetailState?
 	var navigationState = NavigationState()
 
-	mutating func createPayback() {
-		let payback = detailState!.payback
-		masterState.paybacks.append(payback)
-		navigationState.viewControllerStack.popLast()
-		detailState = nil
-	}
-
 }
 
 extension State {
@@ -54,6 +47,7 @@ typealias MyStore = Store<State>
 
 func createState() -> State {
 	let url = applicationDocumentsDirectory.URLByAppendingPathComponent("state.plist")
+	print(url)
 	if let dictionary = NSDictionary(contentsOfURL: url) as? [String: AnyObject] {
 		return State(dictionary: dictionary)
 	}

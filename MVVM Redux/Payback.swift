@@ -16,13 +16,6 @@ struct Payback: Hashable {
 	let lastName: String
 	let amount: Double
 
-	init(firstName: String, lastName: String, amount: Double) {
-		id = uniqueId++
-		self.firstName = firstName
-		self.lastName = lastName
-		self.amount = amount
-	}
-
 	var hashValue: Int {
 		return id.hashValue
 	}
@@ -50,5 +43,3 @@ extension Payback {
 func ==(lhs: Payback, rhs: Payback) -> Bool {
 	return lhs.id == rhs.id
 }
-
-private var uniqueId = 0

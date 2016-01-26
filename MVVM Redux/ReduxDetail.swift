@@ -23,31 +23,28 @@ struct DetailState {
 		case AmountField = 1
 	}
 	
-	var currentFirstResponder: ResponderField?
-	var nameField: String = ""
-	var amountField: String = ""
+	private (set) var currentFirstResponder: ResponderField?
+	private (set) var nameField: String = ""
+	private (set) var amountField: String = ""
+	
 	var label: String {
 		return nameField + "\n" + amountField
 	}
 	
-	var nameFieldValid: Bool {
+	private var nameFieldValid: Bool {
 		return nameComponents.count >= 2
 	}
 	
-	var amountFieldValid: Bool {
+	private var amountFieldValid: Bool {
 		let value = (amountField as NSString).doubleValue
 		return value.isNormal && value > 0
 	}
 
-	var payback: Payback {
-		guard nameFieldValid && amountFieldValid else { fatalError("Can't create payback.") }
-		let firstName = Array(nameComponents[0..<nameComponents.count - 1]).joinWithSeparator(" ")
-		let lastName = nameComponents.last!
-		let amount = (amountField as NSString).doubleValue
-		return Payback(firstName: firstName, lastName: lastName, amount: amount)
+	private var nameComponents: [String] {
+		return nameField.componentsSeparatedByString(" ").filter { !$0.isEmpty }
 	}
 
-	mutating func updateField(responderField: ResponderField, text: String?) {
+	private mutating func updateField(responderField: ResponderField, text: String?) {
 		switch responderField {
 		case .NameField:
 			nameField = text ?? ""
@@ -56,7 +53,7 @@ struct DetailState {
 		}
 	}
 
-	mutating func updateCurrentFirstResponder(responderField: ResponderField) {
+	private mutating func updateCurrentFirstResponder(responderField: ResponderField) {
 		switch responderField {
 		case .NameField:
 			currentFirstResponder = .AmountField
@@ -65,9 +62,6 @@ struct DetailState {
 		}
 	}
 
-	private var nameComponents: [String] {
-		return nameField.componentsSeparatedByString(" ").filter { !$0.isEmpty }
-	}
 }
 
 extension DetailState {
@@ -117,7 +111,13 @@ func detailReducer(var state: State, action: Action) -> State {
 			state.navigationState.shouldDisplayAlert = Alert(message: "Amount field invalid.")
 		}
 		else {
-			state.createPayback()
+			if let detailState = state.detailState {
+				let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joinWithSeparator(" ")
+				let lastName = detailState.nameComponents.last!
+				let amount = (detailState.amountField as NSString).doubleValue
+				state.masterState.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
+				state.navigationState.viewControllerStack.popLast()
+			}
 		}
 	}
 	return state
