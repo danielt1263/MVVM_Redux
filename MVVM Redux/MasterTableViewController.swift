@@ -22,8 +22,7 @@ class MasterTableViewController: UITableViewController {
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
 		unsubscribe = mainStore.subscribe { [unowned self] state in
-			let masterState = state.masterState
-			let newItems = masterState.paybacks
+			let newItems = state.paybackCollection.paybacks
 			var arrayCompare = ArrayCompare<Payback>()
 			arrayCompare.old = self.items
 			arrayCompare.new = newItems

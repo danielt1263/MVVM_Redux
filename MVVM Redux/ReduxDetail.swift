@@ -115,7 +115,7 @@ func detailReducer(var state: State, action: Action) -> State {
 				let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joinWithSeparator(" ")
 				let lastName = detailState.nameComponents.last!
 				let amount = (detailState.amountField as NSString).doubleValue
-				state.masterState.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
+				state.paybackCollection.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
 				state.navigationState.viewControllerStack.popLast()
 			}
 		}

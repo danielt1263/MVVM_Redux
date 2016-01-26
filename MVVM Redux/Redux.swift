@@ -12,26 +12,27 @@ import BasicRedux
 
 struct State {
 
-	var masterState = MasterState()
 	var detailState: DetailState?
 	var navigationState = NavigationState()
 
+	var paybackCollection = PaybackCollection()
+	
 }
 
 extension State {
 	
 	init(dictionary: [String: AnyObject]) {
-		masterState = MasterState(dictionary: dictionary["masterState"] as! [String: AnyObject])
 		if let detail = dictionary["detailState"] as? [String: AnyObject] {
 			detailState = DetailState(dictionary: detail)
 		}
 		navigationState = NavigationState(dictionary: dictionary["navigationState"] as! [String: AnyObject])
+		paybackCollection = PaybackCollection(dictionary: dictionary["paybackCollection"] as! [String: AnyObject])
 	}
 
 	var dictionary: [String: AnyObject] {
 		var result = [
-			"masterState": masterState.dictionary,
-			"navigationState": navigationState.dictionary
+			"navigationState": navigationState.dictionary,
+			"paybackCollection": paybackCollection.dictionary
 		]
 		if let detailState = detailState {
 			result["detailState"] = detailState.dictionary

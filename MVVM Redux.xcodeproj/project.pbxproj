@@ -15,6 +15,7 @@
 		722FE66F1C51C7B900107118 /* BasicRedux.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D23F1C4B3B2100A88A65 /* BasicRedux.swift */; };
 		7231A0E11C4E62CA007DAE1F /* ReduxDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7231A0E01C4E62CA007DAE1F /* ReduxDetail.swift */; };
 		7231A0E31C4E6353007DAE1F /* ReduxNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7231A0E21C4E6353007DAE1F /* ReduxNavigation.swift */; };
+		72A548911C56FF5800232547 /* PaybackCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A548901C56FF5800232547 /* PaybackCollection.swift */; };
 		72C7D2211C49E7B200A88A65 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D2201C49E7B200A88A65 /* AppDelegate.swift */; };
 		72C7D2261C49E7B200A88A65 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 72C7D2241C49E7B200A88A65 /* Main.storyboard */; };
 		72C7D2281C49E7B200A88A65 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72C7D2271C49E7B200A88A65 /* Assets.xcassets */; };
@@ -57,6 +58,7 @@
 		722FE6621C51C4CE00107118 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7231A0E01C4E62CA007DAE1F /* ReduxDetail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReduxDetail.swift; sourceTree = "<group>"; };
 		7231A0E21C4E6353007DAE1F /* ReduxNavigation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReduxNavigation.swift; sourceTree = "<group>"; };
+		72A548901C56FF5800232547 /* PaybackCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaybackCollection.swift; sourceTree = "<group>"; };
 		72C7D21D1C49E7B100A88A65 /* MVVM Redux.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MVVM Redux.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		72C7D2201C49E7B200A88A65 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		72C7D2251C49E7B200A88A65 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 			children = (
 				72C7D2411C4B3C5E00A88A65 /* Redux.swift */,
 				72C7D2371C49E99500A88A65 /* Payback.swift */,
+				72A548901C56FF5800232547 /* PaybackCollection.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -315,6 +318,7 @@
 				7231A0E31C4E6353007DAE1F /* ReduxNavigation.swift in Sources */,
 				090CF6931C4FCE1B00017722 /* ReduxMaster.swift in Sources */,
 				72C7D2381C49E99500A88A65 /* Payback.swift in Sources */,
+				72A548911C56FF5800232547 /* PaybackCollection.swift in Sources */,
 				72C7D2421C4B3C5E00A88A65 /* Redux.swift in Sources */,
 				72C7D2351C49E8C700A88A65 /* DetailViewController.swift in Sources */,
 				7231A0E11C4E62CA007DAE1F /* ReduxDetail.swift in Sources */,
