@@ -6,12 +6,21 @@
 //  Copyright © 2016 Daniel Tartaglia. All rights reserved.
 //
 
-public protocol Action { }
+import Swift
 
-public class Store<State> {
+
+public protocol StateObserver: class {
+
+	func updateWithState(state: State)
+
+	typealias State
+
+}
+
+
+public class Store<State, Action> {
 	
 	public typealias Reducer = (state: State, action: Action) -> State
-	public typealias Observer = (state: State) -> Void
 	public typealias Unsubscriber = () -> Void
 	public typealias Dispatcher = (action: Action) -> Void
 	public typealias Middleware = (next: Dispatcher, state: () -> State) -> Dispatcher
@@ -28,13 +37,13 @@ public class Store<State> {
 		dispatcher(action: action)
 	}
 	
-	public func subscribe(observer: Observer) -> Unsubscriber {
+	public func subscribe<SO: StateObserver where SO.State == State>(observer: SO) -> Unsubscriber {
 		let id = uniqueId
-		subscribers[id] = observer
+		subscribers[id] = AnyStateObserver(observer: observer)
 		let dispose = { [weak self] () -> Void in
 			self?.subscribers.removeValueForKey(id)
 		}
-		observer(state: state)
+		observer.updateWithState(state)
 		uniqueId += 1
 		return dispose
 	}
@@ -49,7 +58,7 @@ public class Store<State> {
 	
 	private func update() {
 		for (_, subscriber) in subscribers {
-			subscriber(state: state)
+			subscriber.updateWithState(state)
 		}
 	}
 
@@ -57,12 +66,25 @@ public class Store<State> {
 	private var reducer: Reducer
 	private var isDispatching = false
 	private var uniqueId: Int = 0
-	private var subscribers: [Int: Observer] = [:]
+	private var subscribers: [Int: AnyStateObserver<State>] = [:]
 	private var dispatcher: Dispatcher = { _ in }
 }
 
-public func combineReducers<State>(reducers: [Store<State>.Reducer]) -> Store<State>.Reducer {
+public func combineReducers<State, Action>(reducers: [Store<State, Action>.Reducer]) -> Store<State, Action>.Reducer {
 	return { state, action in
 		return reducers.reduce(state) { state, reducer in reducer(state: state, action: action) }
 	}
+}
+
+public class AnyStateObserver<T>: StateObserver {
+	
+	public init<SO: StateObserver where SO.State == T>(observer: SO) {
+		self.observer = observer.updateWithState
+	}
+	
+	public func updateWithState(state: T) {
+		observer(state: state)
+	}
+	
+	private let observer: (state: T) -> Void
 }

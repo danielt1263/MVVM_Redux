@@ -20,24 +20,7 @@ class DetailViewController: UIViewController {
 
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		unsubscribe = mainStore.subscribe { [unowned self] state in
-			guard let detailState = state.detailState else { return }
-			
-			self.nameField.text = detailState.nameField
-			self.amountField.text = detailState.amountField
-			self.resultLabel.text = detailState.label
-			
-			self.programaticallyBecomingFirstResponder = true
-			switch detailState.currentFirstResponder {
-			case .Some(.NameField):
-				self.nameField.becomeFirstResponder()
-			case .Some(.AmountField):
-				self.amountField.becomeFirstResponder()
-			case .None:
-				self.view.endEditing(true)
-			}
-			self.programaticallyBecomingFirstResponder = false
-		}
+		unsubscribe = mainStore.subscribe(self)
 	}
 
 	override func viewWillDisappear(animated: Bool) {
@@ -79,7 +62,29 @@ class DetailViewController: UIViewController {
 		mainStore.dispatch(DetailAction.Done)
 	}
 	
-	var unsubscribe: Store<State>.Unsubscriber = { }
+	var unsubscribe: MainStore.Unsubscriber = { }
 	var programaticallyBecomingFirstResponder = false
 
+}
+
+extension DetailViewController: StateObserver {
+
+	func updateWithState(state: State) {
+		guard let detailState = state.detailState else { return }
+		
+		nameField.text = detailState.nameField
+		amountField.text = detailState.amountField
+		resultLabel.text = detailState.label
+		
+		programaticallyBecomingFirstResponder = true
+		switch detailState.currentFirstResponder {
+		case .Some(.NameField):
+			nameField.becomeFirstResponder()
+		case .Some(.AmountField):
+			amountField.becomeFirstResponder()
+		case .None:
+			view.endEditing(true)
+		}
+		programaticallyBecomingFirstResponder = false
+	}
 }

@@ -7,45 +7,14 @@
 //
 
 import UIKit
+import BasicRedux
+
 
 class NavigationController: UINavigationController {
 	
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		unsubscribe = mainStore.subscribe { [unowned self] state in
-			let navState = state.navigationState
-			let currentStackCount = self.childViewControllers.count
-			if currentStackCount > navState.viewControllerStack.count {
-				for _ in 0..<(currentStackCount - navState.viewControllerStack.count) {
-					self.popViewControllerAnimated(true)
-				}
-			}
-			else if currentStackCount < navState.viewControllerStack.count {
-				for vc in navState.viewControllerStack[currentStackCount ..< navState.viewControllerStack.count] {
-					let controller = self.storyboard!.instantiateViewControllerWithIdentifier(vc.rawValue)
-					self.pushViewController(controller, animated: true)
-				}
-			}
-			else if navState.viewControllerStack.last?.rawValue != self.childViewControllers.last?.restorationIdentifier {
-				fatalError("NOT HANDLED: Attempted to go back and forward down different path")
-			}
-			
-			if let alert = state.navigationState.shouldDisplayAlert {
-				if let presentedAlert = self.presentedViewController as? UIAlertController {
-					if alert.message != presentedAlert.message {
-						fatalError("NOT HANDLED: Attempted to present alert on an alert")
-					}
-				}
-				else {
-					self.displayErrorAlert(alert.message)
-				}
-			}
-			else {
-				if self.presentedViewController is UIAlertController {
-					self.dismissViewControllerAnimated(true, completion: nil)
-				}
-			}
-		}
+		unsubscribe = mainStore.subscribe(self)
 	}
 	
 	private func displayErrorAlert(message: String) {
@@ -57,4 +26,43 @@ class NavigationController: UINavigationController {
 	}
 	
 	private var unsubscribe: () -> Void = { }
+}
+
+extension NavigationController: StateObserver {
+	
+	func updateWithState(state: State) {
+		let navState = state.navigationState
+		let currentStackCount = childViewControllers.count
+		if currentStackCount > navState.viewControllerStack.count {
+			for _ in 0..<(currentStackCount - navState.viewControllerStack.count) {
+				popViewControllerAnimated(true)
+			}
+		}
+		else if currentStackCount < navState.viewControllerStack.count {
+			for vc in navState.viewControllerStack[currentStackCount ..< navState.viewControllerStack.count] {
+				let controller = storyboard!.instantiateViewControllerWithIdentifier(vc.rawValue)
+				pushViewController(controller, animated: true)
+			}
+		}
+		else if navState.viewControllerStack.last?.rawValue != childViewControllers.last?.restorationIdentifier {
+			fatalError("NOT HANDLED: Attempted to go back and forward down different path")
+		}
+		
+		if let alert = state.navigationState.shouldDisplayAlert {
+			if let presentedAlert = presentedViewController as? UIAlertController {
+				if alert.message != presentedAlert.message {
+					fatalError("NOT HANDLED: Attempted to present alert on an alert")
+				}
+			}
+			else {
+				displayErrorAlert(alert.message)
+			}
+		}
+		else {
+			if presentedViewController is UIAlertController {
+				dismissViewControllerAnimated(true, completion: nil)
+			}
+		}
+	}
+	
 }

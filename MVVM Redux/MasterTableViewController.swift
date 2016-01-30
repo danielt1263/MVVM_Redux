@@ -16,30 +16,12 @@ class MasterTableViewController: UITableViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		self.navigationItem.rightBarButtonItem = self.editButtonItem()
+		navigationItem.rightBarButtonItem = editButtonItem()
 	}
 	
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		unsubscribe = mainStore.subscribe { [unowned self] state in
-			let newItems = state.paybackCollection.paybacks
-			var arrayCompare = ArrayCompare<Payback>()
-			arrayCompare.old = self.items
-			arrayCompare.new = newItems
-			arrayCompare.insertBlock = { _, at in
-				self.tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: at, inSection: 0)], withRowAnimation: .Bottom)
-			}
-			arrayCompare.removeBlock = { _, from in
-				self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: from, inSection: 0)], withRowAnimation: .Automatic)
-			}
-			arrayCompare.moveBlock = { _, from, to in
-				self.tableView.moveRowAtIndexPath(NSIndexPath(forRow: from, inSection: 0), toIndexPath: NSIndexPath(forRow: to, inSection: 0))
-			}
-			self.items = newItems
-			self.tableView.beginUpdates()
-			arrayCompare.run()
-			self.tableView.endUpdates()
-		}
+		unsubscribe = mainStore.subscribe(self)
 	}
 	
 	override func viewWillDisappear(animated: Bool) {
@@ -72,9 +54,32 @@ class MasterTableViewController: UITableViewController {
 		mainStore.dispatch(MasterAction.AddItem)
 	}
 	
-	var unsubscribe: Store<State>.Unsubscriber = { }
+	var unsubscribe: MainStore.Unsubscriber = { }
 	var items: [Payback] = []
 
+}
+
+extension MasterTableViewController: StateObserver {
+
+	func updateWithState(state: State) {
+		let newItems = state.paybackCollection.paybacks
+		var arrayCompare = ArrayCompare<Payback>()
+		arrayCompare.old = items
+		arrayCompare.new = newItems
+		arrayCompare.insertBlock = { _, at in
+			self.tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: at, inSection: 0)], withRowAnimation: .Bottom)
+		}
+		arrayCompare.removeBlock = { _, from in
+			self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: from, inSection: 0)], withRowAnimation: .Automatic)
+		}
+		arrayCompare.moveBlock = { _, from, to in
+			self.tableView.moveRowAtIndexPath(NSIndexPath(forRow: from, inSection: 0), toIndexPath: NSIndexPath(forRow: to, inSection: 0))
+		}
+		items = newItems
+		tableView.beginUpdates()
+		arrayCompare.run()
+		tableView.endUpdates()
+	}
 }
 
 
