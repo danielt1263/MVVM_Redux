@@ -9,11 +9,6 @@
 import BasicRedux
 
 
-enum NavigationAction: Action {
-	case AlertDismissed
-}
-
-
 struct NavigationState {
 	
 	var viewControllerStack = [ViewController.MasterTableViewController]
@@ -65,14 +60,4 @@ extension Alert {
 enum ViewController: String {
 	case MasterTableViewController = "MasterTableViewController"
 	case DetailViewController = "DetailViewController"	
-}
-
-
-func navigationReducer(var state: State, action: Action) -> State {
-	guard let action = action as? NavigationAction else { return state }
-	switch action {
-	case .AlertDismissed:
-		state.navigationState.shouldDisplayAlert = nil
-	}
-	return state
 }

@@ -10,8 +10,6 @@ import Foundation
 import BasicRedux
 
 
-protocol Action { }
-
 struct State {
 
 	var detailState: DetailState?
@@ -44,9 +42,9 @@ extension State {
 }
 
 
-let mainStore = Store(state: createState(), reducer: combineReducers([navigationReducer, masterReducer, detailReducer]), middleware: [logStateMiddleware])
+let mainStore = Store(state: createState(), middleware: [logStateMiddleware])
 
-typealias MainStore = Store<State, Action>
+typealias MainStore = Store<State>
 
 func createState() -> State {
 	let url = applicationDocumentsDirectory.URLByAppendingPathComponent("state.plist")

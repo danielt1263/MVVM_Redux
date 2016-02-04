@@ -20,7 +20,9 @@ class DetailViewController: UIViewController {
 
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		unsubscribe = mainStore.subscribe(self)
+		unsubscribe = mainStore.subscribe { [weak self] state in
+			self?.updateWithState(state)
+		}
 	}
 
 	override func viewWillDisappear(animated: Bool) {
@@ -29,47 +31,61 @@ class DetailViewController: UIViewController {
 	}
 	
 	@IBAction func cancelAction(sender: UIBarButtonItem) {
-		mainStore.dispatch(DetailAction.Cancel)
+		mainStore.dispatch { state in
+			state.navigationState.viewControllerStack.popLast()
+			state.detailState = nil
+		}
 	}
 	
 	@IBAction func nameFieldDidBegin(sender: AnyObject) {
 		guard !programaticallyBecomingFirstResponder else { return }
-		mainStore.dispatch(DetailAction.EditingDidBegin(.NameField))
+		mainStore.dispatch { state in
+			state.detailState?.currentFirstResponder = .NameField
+			return
+		}
 	}
 	
 	@IBAction func nameFieldChanged(sender: UITextField) {
-		mainStore.dispatch(DetailAction.EditingChanged(.NameField, sender.text))
+		mainStore.dispatch { state in
+			state.detailState?.updateField(.NameField, text: sender.text)
+			return
+		}
 	}
 	
 	@IBAction func nameFieldDidEndOnExit(sender: AnyObject) {
-		mainStore.dispatch(DetailAction.DidEndOnExit(.NameField))
+		mainStore.dispatch { state in
+			state.detailState?.updateCurrentFirstResponder(.NameField)
+			return
+		}
 	}
 
 	@IBAction func amountFieldDidBegin(sender: UITextField) {
 		guard !programaticallyBecomingFirstResponder else { return }
-		mainStore.dispatch(DetailAction.EditingDidBegin(.AmountField))
+		mainStore.dispatch { state in
+			state.detailState?.currentFirstResponder = .AmountField
+			return
+		}
 	}
 	
 	@IBAction func amountFieldChanged(sender: UITextField) {
-		mainStore.dispatch(DetailAction.EditingChanged(.AmountField, sender.text))
+		mainStore.dispatch { state in
+			state.detailState?.updateField(.AmountField, text: sender.text)
+			return
+		}
 	}
 	
 	@IBAction func amountFieldDidEndOnExit(sender: UITextField) {
-		mainStore.dispatch(DetailAction.DidEndOnExit(.AmountField))
+		mainStore.dispatch { state in
+			state.detailState?.updateCurrentFirstResponder(.AmountField)
+			return
+		}
 	}
 	
 	@IBAction func doneAction(sender: UIBarButtonItem) {
-		mainStore.dispatch(DetailAction.Done)
+		mainStore.dispatch(done)
 	}
 	
-	var unsubscribe: MainStore.Unsubscriber = { }
-	var programaticallyBecomingFirstResponder = false
-
-}
-
-extension DetailViewController: StateObserver {
-
-	func updateWithState(state: State) {
+	private func updateWithState(state: State) {
 		guard let detailState = state.detailState else { return }
 		
 		nameField.text = detailState.nameField
@@ -86,5 +102,27 @@ extension DetailViewController: StateObserver {
 			view.endEditing(true)
 		}
 		programaticallyBecomingFirstResponder = false
+	}
+
+	private var unsubscribe: MainStore.Unsubscriber = { }
+	private var programaticallyBecomingFirstResponder = false
+
+}
+
+private func done(inout state: State) {
+	if state.detailState!.nameFieldValid == false {
+		state.navigationState.shouldDisplayAlert = Alert(message: "Name field invalid.")
+	}
+	else if state.detailState!.amountFieldValid == false {
+		state.navigationState.shouldDisplayAlert = Alert(message: "Amount field invalid.")
+	}
+	else {
+		if let detailState = state.detailState {
+			let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joinWithSeparator(" ")
+			let lastName = detailState.nameComponents.last!
+			let amount = (detailState.amountField as NSString).doubleValue
+			state.paybackCollection.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
+			state.navigationState.viewControllerStack.popLast()
+		}
 	}
 }

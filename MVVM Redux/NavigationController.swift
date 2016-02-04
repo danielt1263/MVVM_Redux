@@ -14,23 +14,12 @@ class NavigationController: UINavigationController {
 	
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		unsubscribe = mainStore.subscribe(self)
+		unsubscribe = mainStore.subscribe { [weak self] state in
+			self?.updateWithState(state)
+		}
 	}
 	
-	private func displayErrorAlert(message: String) {
-		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .Alert)
-		alert.addAction(UIAlertAction(title: "OK", style: .Cancel) { _ in
-			mainStore.dispatch(NavigationAction.AlertDismissed)
-			})
-		presentViewController(alert, animated: true, completion: nil)
-	}
-	
-	private var unsubscribe: () -> Void = { }
-}
-
-extension NavigationController: StateObserver {
-	
-	func updateWithState(state: State) {
+	private func updateWithState(state: State) {
 		let navState = state.navigationState
 		let currentStackCount = childViewControllers.count
 		if currentStackCount > navState.viewControllerStack.count {
@@ -64,5 +53,17 @@ extension NavigationController: StateObserver {
 			}
 		}
 	}
+
+	private func displayErrorAlert(message: String) {
+		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .Alert)
+		alert.addAction(UIAlertAction(title: "OK", style: .Cancel) { _ in
+			mainStore.dispatch { state in
+				state.navigationState.shouldDisplayAlert = nil
+				return
+			}
+		})
+		presentViewController(alert, animated: true, completion: nil)
+	}
 	
+	private var unsubscribe: () -> Void = { }
 }

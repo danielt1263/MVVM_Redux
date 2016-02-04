@@ -21,7 +21,9 @@ class MasterTableViewController: UITableViewController {
 	
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		unsubscribe = mainStore.subscribe(self)
+		unsubscribe = mainStore.subscribe { [weak self] state in
+			self?.updateWithState(state)
+		}
 	}
 	
 	override func viewWillDisappear(animated: Bool) {
@@ -46,22 +48,21 @@ class MasterTableViewController: UITableViewController {
 
 	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
 		if editingStyle == .Delete {
-			mainStore.dispatch(MasterAction.DeleteItem(index: indexPath.row))
+			mainStore.dispatch { state in
+				state.paybackCollection.removeAtIndex(indexPath.row)
+				return
+			}
 		}
 	}
 
 	@IBAction func addAction(sender: AnyObject) {
-		mainStore.dispatch(MasterAction.AddItem)
+		mainStore.dispatch { state in
+			state.navigationState.viewControllerStack.append(.DetailViewController)
+			state.detailState = DetailState()
+		}
 	}
 	
-	var unsubscribe: MainStore.Unsubscriber = { }
-	var items: [Payback] = []
-
-}
-
-extension MasterTableViewController: StateObserver {
-
-	func updateWithState(state: State) {
+	private func updateWithState(state: State) {
 		let newItems = state.paybackCollection.paybacks
 		var arrayCompare = ArrayCompare<Payback>()
 		arrayCompare.old = items
@@ -80,8 +81,11 @@ extension MasterTableViewController: StateObserver {
 		arrayCompare.run()
 		tableView.endUpdates()
 	}
-}
 
+	private var unsubscribe: MainStore.Unsubscriber = { }
+	private var items: [Payback] = []
+
+}
 
 //Snagged from http://www.swift-studies.com/blog/2015/5/15/swift-coding-challenge-incremental-updates-to-views
 
