@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		090CF6931C4FCE1B00017722 /* ReduxMaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090CF6921C4FCE1B00017722 /* ReduxMaster.swift */; };
+		09549EB61CD11BD4008965E1 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09549EB51CD11BD4008965E1 /* Actions.swift */; };
 		72254CFC1C5100A200406B62 /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72254CFB1C5100A200406B62 /* NavigationController.swift */; };
 		722FE6611C51C4CE00107118 /* BasicRedux.h in Headers */ = {isa = PBXBuildFile; fileRef = 722FE6601C51C4CE00107118 /* BasicRedux.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		722FE6651C51C4CE00107118 /* BasicRedux.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 722FE65E1C51C4CE00107118 /* BasicRedux.framework */; };
@@ -23,7 +24,7 @@
 		72C7D2331C49E8A300A88A65 /* MasterTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D2321C49E8A300A88A65 /* MasterTableViewController.swift */; };
 		72C7D2351C49E8C700A88A65 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D2341C49E8C700A88A65 /* DetailViewController.swift */; };
 		72C7D2381C49E99500A88A65 /* Payback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D2371C49E99500A88A65 /* Payback.swift */; };
-		72C7D2421C4B3C5E00A88A65 /* Redux.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D2411C4B3C5E00A88A65 /* Redux.swift */; };
+		72C7D2421C4B3C5E00A88A65 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C7D2411C4B3C5E00A88A65 /* Store.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		090CF6921C4FCE1B00017722 /* ReduxMaster.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReduxMaster.swift; sourceTree = "<group>"; };
+		09549EB51CD11BD4008965E1 /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
 		72254CFB1C5100A200406B62 /* NavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		722FE65E1C51C4CE00107118 /* BasicRedux.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BasicRedux.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		722FE6601C51C4CE00107118 /* BasicRedux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicRedux.h; sourceTree = "<group>"; };
@@ -69,7 +71,7 @@
 		72C7D2341C49E8C700A88A65 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		72C7D2371C49E99500A88A65 /* Payback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Payback.swift; sourceTree = "<group>"; };
 		72C7D23F1C4B3B2100A88A65 /* BasicRedux.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicRedux.swift; sourceTree = "<group>"; };
-		72C7D2411C4B3C5E00A88A65 /* Redux.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Redux.swift; sourceTree = "<group>"; };
+		72C7D2411C4B3C5E00A88A65 /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		9F203E743DF54BA8F315C3D5 /* Pods_MVVM_Redux.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MVVM_Redux.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A33778CB8F3DC297BF69DB66 /* Pods-MVVM Redux.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MVVM Redux.release.xcconfig"; path = "Pods/Target Support Files/Pods-MVVM Redux/Pods-MVVM Redux.release.xcconfig"; sourceTree = "<group>"; };
 		B89EF3017A5712717AC45689 /* Pods-MVVM Redux.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MVVM Redux.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MVVM Redux/Pods-MVVM Redux.debug.xcconfig"; sourceTree = "<group>"; };
@@ -134,9 +136,10 @@
 		722FE66E1C51C78D00107118 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				72C7D2411C4B3C5E00A88A65 /* Redux.swift */,
+				72C7D2411C4B3C5E00A88A65 /* Store.swift */,
 				72C7D2371C49E99500A88A65 /* Payback.swift */,
 				72A548901C56FF5800232547 /* PaybackCollection.swift */,
+				09549EB51CD11BD4008965E1 /* Actions.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -319,7 +322,8 @@
 				090CF6931C4FCE1B00017722 /* ReduxMaster.swift in Sources */,
 				72C7D2381C49E99500A88A65 /* Payback.swift in Sources */,
 				72A548911C56FF5800232547 /* PaybackCollection.swift in Sources */,
-				72C7D2421C4B3C5E00A88A65 /* Redux.swift in Sources */,
+				72C7D2421C4B3C5E00A88A65 /* Store.swift in Sources */,
+				09549EB61CD11BD4008965E1 /* Actions.swift in Sources */,
 				72C7D2351C49E8C700A88A65 /* DetailViewController.swift in Sources */,
 				7231A0E11C4E62CA007DAE1F /* ReduxDetail.swift in Sources */,
 				72C7D2211C49E7B200A88A65 /* AppDelegate.swift in Sources */,

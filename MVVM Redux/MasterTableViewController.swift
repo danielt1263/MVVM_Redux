@@ -17,20 +17,11 @@ class MasterTableViewController: UITableViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		navigationItem.rightBarButtonItem = editButtonItem()
-	}
-	
-	override func viewDidAppear(animated: Bool) {
-		super.viewDidAppear(animated)
 		unsubscribe = mainStore.subscribe { [weak self] state in
 			self?.updateWithState(state)
 		}
 	}
 	
-	override func viewWillDisappear(animated: Bool) {
-		unsubscribe()
-		super.viewWillDisappear(animated)
-	}
-
 	// MARK: - Table view data source
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return items.count
@@ -48,18 +39,12 @@ class MasterTableViewController: UITableViewController {
 
 	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
 		if editingStyle == .Delete {
-			mainStore.dispatch { state in
-				state.paybackCollection.removeAtIndex(indexPath.row)
-				return
-			}
+			mainStore.dispatch(deletePayback(index: indexPath.row))
 		}
 	}
 
 	@IBAction func addAction(sender: AnyObject) {
-		mainStore.dispatch { state in
-			state.navigationState.viewControllerStack.append(.DetailViewController)
-			state.detailState = DetailState()
-		}
+		mainStore.dispatch(presentAddPaybackScreen)
 	}
 	
 	private func updateWithState(state: State) {
@@ -82,7 +67,7 @@ class MasterTableViewController: UITableViewController {
 		tableView.endUpdates()
 	}
 
-	private var unsubscribe: MainStore.Unsubscriber = { }
+	private var unsubscribe: Unsubscriber?
 	private var items: [Payback] = []
 
 }

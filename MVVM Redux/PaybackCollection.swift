@@ -12,7 +12,9 @@ struct PaybackCollection {
 	private (set) var paybacks: [Payback] = []
 	
 	mutating func addPaybackWithFirstName(firstName: String, lastName: String, amount: Double) {
-		let payback = Payback(id: uniqueId++, firstName: firstName, lastName: lastName, amount: amount)
+		let id = uniqueId
+		uniqueId += 1
+		let payback = Payback(id: id, firstName: firstName, lastName: lastName, amount: amount)
 		paybacks.append(payback)
 	}
 	

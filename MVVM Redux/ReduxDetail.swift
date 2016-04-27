@@ -10,6 +10,7 @@ import BasicRedux
 
 
 struct DetailState {
+	
     enum ResponderField: Int {
 		case NameField = 0
 		case AmountField = 1
@@ -42,15 +43,6 @@ struct DetailState {
 			nameField = text ?? ""
 		case .AmountField:
 			amountField = text ?? ""
-		}
-	}
-
-	mutating func updateCurrentFirstResponder(responderField: ResponderField) {
-		switch responderField {
-		case .NameField:
-			currentFirstResponder = .AmountField
-		case .AmountField:
-			currentFirstResponder = nil
 		}
 	}
 

@@ -11,9 +11,9 @@ import BasicRedux
 
 
 class NavigationController: UINavigationController {
-	
-	override func viewDidAppear(animated: Bool) {
-		super.viewDidAppear(animated)
+
+	override func viewDidLoad() {
+		super.viewDidLoad()
 		unsubscribe = mainStore.subscribe { [weak self] state in
 			self?.updateWithState(state)
 		}
@@ -57,13 +57,10 @@ class NavigationController: UINavigationController {
 	private func displayErrorAlert(message: String) {
 		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .Alert)
 		alert.addAction(UIAlertAction(title: "OK", style: .Cancel) { _ in
-			mainStore.dispatch { state in
-				state.navigationState.shouldDisplayAlert = nil
-				return
-			}
+			mainStore.dispatch(exitedErrorAlert)
 		})
 		presentViewController(alert, animated: true, completion: nil)
 	}
 	
-	private var unsubscribe: () -> Void = { }
+	private var unsubscribe: Unsubscriber?
 }
