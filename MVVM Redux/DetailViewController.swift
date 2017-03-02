@@ -25,37 +25,37 @@ class DetailViewController: UIViewController {
 		}
 	}
 
-	@IBAction func cancelAction(sender: UIBarButtonItem) {
+	@IBAction func cancelAction(_ sender: UIBarButtonItem) {
 		mainStore.dispatch(cancelAddPayback)
 	}
 
-	@IBAction func nameFieldDidBegin(sender: AnyObject) {
+	@IBAction func nameFieldDidBegin(_ sender: AnyObject) {
 		guard !programaticallyBecomingFirstResponder else { return }
-		mainStore.dispatch(setCurrentFirstResponder(.NameField))
+		mainStore.dispatch(setCurrentFirstResponder(.nameField))
 	}
 
-	@IBAction func nameFieldChanged(sender: UITextField) {
-		mainStore.dispatch(update(responderField: .NameField, text: sender.text ?? ""))
+	@IBAction func nameFieldChanged(_ sender: UITextField) {
+		mainStore.dispatch(update(responderField: .nameField, text: sender.text ?? ""))
 	}
 
 	@IBAction func didEndOnExit(_: AnyObject) {
 		mainStore.dispatch(setNextResponder)
 	}
 
-	@IBAction func amountFieldDidBegin(sender: UITextField) {
+	@IBAction func amountFieldDidBegin(_ sender: UITextField) {
 		guard !programaticallyBecomingFirstResponder else { return }
-		mainStore.dispatch(setCurrentFirstResponder(.AmountField))
+		mainStore.dispatch(setCurrentFirstResponder(.amountField))
 	}
 
-	@IBAction func amountFieldChanged(sender: UITextField) {
-		mainStore.dispatch(update(responderField: .AmountField, text: sender.text ?? ""))
+	@IBAction func amountFieldChanged(_ sender: UITextField) {
+		mainStore.dispatch(update(responderField: .amountField, text: sender.text ?? ""))
 	}
 
-	@IBAction func doneAction(sender: UIBarButtonItem) {
+	@IBAction func doneAction(_ sender: UIBarButtonItem) {
 		mainStore.dispatch(savePayback)
 	}
 
-	private func updateWithState(state: State) {
+	fileprivate func updateWithState(_ state: State) {
 		guard let detailState = state.detailState else { return }
 
 		nameField.text = detailState.nameField
@@ -64,18 +64,18 @@ class DetailViewController: UIViewController {
 
 		programaticallyBecomingFirstResponder = true
 		switch detailState.currentFirstResponder {
-		case .Some(.NameField):
+		case .some(.nameField):
 			nameField.becomeFirstResponder()
-		case .Some(.AmountField):
+		case .some(.amountField):
 			amountField.becomeFirstResponder()
-		case .None:
+		case .none:
 			view.endEditing(true)
 		}
 		programaticallyBecomingFirstResponder = false
 	}
 
-	private var unsubscribe: Unsubscriber?
-	private var programaticallyBecomingFirstResponder = false
+	fileprivate var unsubscribe: Unsubscriber?
+	fileprivate var programaticallyBecomingFirstResponder = false
 
 }
 

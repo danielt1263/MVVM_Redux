@@ -37,7 +37,7 @@ extension State {
 		if let detailState = detailState {
 			result["detailState"] = detailState.dictionary
 		}
-		return result
+		return result as [String : AnyObject]
 	}
 }
 
@@ -47,9 +47,9 @@ let mainStore = Store(state: createState(), middleware: [logStateMiddleware])
 typealias MainStore = Store<State>
 
 func createState() -> State {
-	let url = applicationDocumentsDirectory.URLByAppendingPathComponent("state.plist")
+	let url = applicationDocumentsDirectory.appendingPathComponent("state.plist")
 	print(url)
-	if let dictionary = NSDictionary(contentsOfURL: url) as? [String: AnyObject] {
+	if let dictionary = NSDictionary(contentsOf: url) as? [String: AnyObject] {
 		return State(dictionary: dictionary)
 	}
 	else {
@@ -57,14 +57,14 @@ func createState() -> State {
 	}
 }
 
-func logStateMiddleware(next: MainStore.Dispatcher, state: () -> State) -> MainStore.Dispatcher {
+func logStateMiddleware(_ next: @escaping MainStore.Dispatcher, state: @escaping () -> State) -> MainStore.Dispatcher {
 	return { action in
-		let url = applicationDocumentsDirectory.URLByAppendingPathComponent("state.plist")
-		(state().dictionary as NSDictionary).writeToURL(url, atomically: true)
-		next(action: action)
+		let url = applicationDocumentsDirectory.appendingPathComponent("state.plist")
+		(state().dictionary as NSDictionary).write(to: url, atomically: true)
+		next(action)
 	}
 }
 
-var applicationDocumentsDirectory: NSURL {
-	return NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
+var applicationDocumentsDirectory: URL {
+	return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
 }

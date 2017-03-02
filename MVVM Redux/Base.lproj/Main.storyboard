@@ -8,11 +8,16 @@
         <!--Navigation Controller-->
         <scene sceneID="9dp-AI-uQH">
             <objects>
-                <navigationController id="j1l-V5-ac4" customClass="NavigationController" customModule="MVVM_Redux" customModuleProvider="target" sceneMemberID="viewController">
+                <navigationController toolbarHidden="NO" id="j1l-V5-ac4" customClass="NavigationController" customModule="MVVM_Redux" customModuleProvider="target" sceneMemberID="viewController">
+                    <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="AvC-K0-oaZ">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="fGv-nH-eOo">
+                        <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="raQ-9t-lTz" kind="relationship" relationship="rootViewController" id="jMa-oN-Hhr"/>
                     </connections>

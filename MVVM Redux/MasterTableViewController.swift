@@ -16,19 +16,19 @@ class MasterTableViewController: UITableViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		navigationItem.rightBarButtonItem = editButtonItem()
+		navigationItem.rightBarButtonItem = editButtonItem
 		unsubscribe = mainStore.subscribe { [weak self] state in
 			self?.updateWithState(state)
 		}
 	}
 	
 	// MARK: - Table view data source
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return items.count
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
 
 		let item = items[indexPath.row]
 		cell.textLabel?.text = item.firstName + " " + String(item.lastName.characters.first!) + "."
@@ -37,29 +37,29 @@ class MasterTableViewController: UITableViewController {
 		return cell
 	}
 
-	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-		if editingStyle == .Delete {
+	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+		if editingStyle == .delete {
 			mainStore.dispatch(deletePayback(index: indexPath.row))
 		}
 	}
 
-	@IBAction func addAction(sender: AnyObject) {
+	@IBAction func addAction(_ sender: AnyObject) {
 		mainStore.dispatch(presentAddPaybackScreen)
 	}
 	
-	private func updateWithState(state: State) {
+	fileprivate func updateWithState(_ state: State) {
 		let newItems = state.paybackCollection.paybacks
 		var arrayCompare = ArrayCompare<Payback>()
 		arrayCompare.old = items
 		arrayCompare.new = newItems
 		arrayCompare.insertBlock = { _, at in
-			self.tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: at, inSection: 0)], withRowAnimation: .Bottom)
+			self.tableView.insertRows(at: [IndexPath(row: at, section: 0)], with: .bottom)
 		}
 		arrayCompare.removeBlock = { _, from in
-			self.tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: from, inSection: 0)], withRowAnimation: .Automatic)
+			self.tableView.deleteRows(at: [IndexPath(row: from, section: 0)], with: .automatic)
 		}
 		arrayCompare.moveBlock = { _, from, to in
-			self.tableView.moveRowAtIndexPath(NSIndexPath(forRow: from, inSection: 0), toIndexPath: NSIndexPath(forRow: to, inSection: 0))
+			self.tableView.moveRow(at: IndexPath(row: from, section: 0), to: IndexPath(row: to, section: 0))
 		}
 		items = newItems
 		tableView.beginUpdates()
@@ -67,8 +67,8 @@ class MasterTableViewController: UITableViewController {
 		tableView.endUpdates()
 	}
 
-	private var unsubscribe: Unsubscriber?
-	private var items: [Payback] = []
+	fileprivate var unsubscribe: Unsubscriber?
+	fileprivate var items: [Payback] = []
 
 }
 
@@ -79,30 +79,30 @@ struct ArrayCompare<T: Hashable> {
 	var old: [T] = []
 	var new: [T] = []
 
-	var insertBlock: (insert: T, at: Int) -> Void = { _, _ in }
-	var removeBlock: (remove: T, from: Int) -> Void = { _, _ in }
-	var moveBlock: (move: T, from: Int, to: Int) -> Void = { _, _, _ in }
+	var insertBlock: (_ insert: T, _ at: Int) -> Void = { _, _ in }
+	var removeBlock: (_ remove: T, _ from: Int) -> Void = { _, _ in }
+	var moveBlock: (_ move: T, _ from: Int, _ to: Int) -> Void = { _, _, _ in }
 
 	func run() {
 		var newPositions: [T: Int] = [:]
-		for (index, obj) in new.enumerate() {
+		for (index, obj) in new.enumerated() {
 			newPositions[obj] = index
 		}
 
-		for (index, obj) in old.enumerate() {
+		for (index, obj) in old.enumerated() {
 			if let newPosition = newPositions[obj] {
 				if index != newPosition {
-					moveBlock(move: obj, from: index, to: newPosition)
+					moveBlock(obj, index, newPosition)
 				}
-				newPositions.removeValueForKey(obj)
+				newPositions.removeValue(forKey: obj)
 			}
 			else {
-				removeBlock(remove: obj, from: index)
+				removeBlock(obj, index)
 			}
 		}
 
 		for (obj, position) in newPositions {
-			insertBlock(insert: obj, at: position)
+			insertBlock(obj, position)
 		}
 	}
 }

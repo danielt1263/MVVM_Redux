@@ -18,7 +18,7 @@ struct NavigationState {
 
 extension NavigationState {
     
-    init(dictionary: [String: AnyObject]) {
+    init(dictionary: [String: Any]) {
 		let stack = dictionary["viewControllerStack"] as! [String]
 		viewControllerStack = stack.map { ViewController(rawValue: $0)! }
 		if let alert = dictionary["shouldDisplayAlert"] as? [String: AnyObject] {
@@ -26,12 +26,12 @@ extension NavigationState {
 		}
     }
 	
-	var dictionary: [String: AnyObject] {
-		var result: [String: AnyObject] = [
+	var dictionary: [String: Any] {
+		var result: [String: Any] = [
 			"viewControllerStack": viewControllerStack.map { $0.rawValue }
 		]
 		if let alert = shouldDisplayAlert {
-			result["shouldDisplayAlert"] = alert.dictionary
+			result["shouldDisplayAlert"] = alert.dictionary as AnyObject?
 		}
 		return result
 	}
@@ -51,7 +51,7 @@ extension Alert {
 	}
 	
 	var dictionary: [String: AnyObject] {
-		return ["message": message]
+		return ["message": message as AnyObject]
 	}
 	
 }

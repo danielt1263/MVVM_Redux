@@ -12,6 +12,12 @@ import BasicRedux
 
 class NavigationController: UINavigationController {
 
+	override func loadView() {
+		super.loadView()
+		let undoButton = UIBarButtonItem(title: "Undo", style: .plain, target: self, action: #selector(undo))
+		setToolbarItems([undoButton], animated: false)
+	}
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		unsubscribe = mainStore.subscribe { [weak self] state in
@@ -19,17 +25,21 @@ class NavigationController: UINavigationController {
 		}
 	}
 	
-	private func updateWithState(state: State) {
+	func undo() {
+		
+	}
+	
+	fileprivate func updateWithState(_ state: State) {
 		let navState = state.navigationState
 		let currentStackCount = childViewControllers.count
 		if currentStackCount > navState.viewControllerStack.count {
 			for _ in 0..<(currentStackCount - navState.viewControllerStack.count) {
-				popViewControllerAnimated(true)
+				popViewController(animated: true)
 			}
 		}
 		else if currentStackCount < navState.viewControllerStack.count {
 			for vc in navState.viewControllerStack[currentStackCount ..< navState.viewControllerStack.count] {
-				let controller = storyboard!.instantiateViewControllerWithIdentifier(vc.rawValue)
+				let controller = storyboard!.instantiateViewController(withIdentifier: vc.rawValue)
 				pushViewController(controller, animated: true)
 			}
 		}
@@ -49,18 +59,23 @@ class NavigationController: UINavigationController {
 		}
 		else {
 			if presentedViewController is UIAlertController {
-				dismissViewControllerAnimated(true, completion: nil)
+				dismiss(animated: true, completion: nil)
 			}
 		}
 	}
 
-	private func displayErrorAlert(message: String) {
-		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .Alert)
-		alert.addAction(UIAlertAction(title: "OK", style: .Cancel) { _ in
+	fileprivate func displayErrorAlert(_ message: String) {
+		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+		alert.addAction(UIAlertAction(title: "OK", style: .cancel) { _ in
 			mainStore.dispatch(exitedErrorAlert)
 		})
-		presentViewController(alert, animated: true, completion: nil)
+		present(alert, animated: true, completion: nil)
 	}
 	
-	private var unsubscribe: Unsubscriber?
+	fileprivate var unsubscribe: Unsubscriber?
+}
+
+
+extension NavigationController: UIToolbarDelegate {
+	
 }

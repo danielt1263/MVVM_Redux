@@ -32,10 +32,10 @@ extension Payback {
 	
 	var dictionary: [String: AnyObject] {
 		return [
-			"id": id,
-			"firstName": firstName,
-			"lastName": lastName,
-			"amount": amount,
+			"id": id as AnyObject,
+			"firstName": firstName as AnyObject,
+			"lastName": lastName as AnyObject,
+			"amount": amount as AnyObject,
 		]
 	}
 }

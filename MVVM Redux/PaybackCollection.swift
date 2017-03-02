@@ -9,32 +9,32 @@
 
 struct PaybackCollection {
 	
-	private (set) var paybacks: [Payback] = []
+	fileprivate (set) var paybacks: [Payback] = []
 	
-	mutating func addPaybackWithFirstName(firstName: String, lastName: String, amount: Double) {
+	mutating func addPaybackWithFirstName(_ firstName: String, lastName: String, amount: Double) {
 		let id = uniqueId
 		uniqueId += 1
 		let payback = Payback(id: id, firstName: firstName, lastName: lastName, amount: amount)
 		paybacks.append(payback)
 	}
 	
-	mutating func removeAtIndex(index: Int) {
-		paybacks.removeAtIndex(index)
+	mutating func removeAtIndex(_ index: Int) {
+		paybacks.remove(at: index)
 	}
 	
-	private var uniqueId = 0
+	fileprivate var uniqueId = 0
 	
 }
 
 extension PaybackCollection {
 	
-	init(dictionary: [String: AnyObject]) {
+	init(dictionary: [String: Any]) {
 		let paybackDicts = dictionary["paybacks"]! as! [[String: AnyObject]]
 		paybacks = paybackDicts.map { Payback(dictionary: $0) }
 		uniqueId = dictionary["uniqueId"]! as! Int
 	}
 	
-	var dictionary: [String: AnyObject] {
+	var dictionary: [String: Any] {
 		return [
 			"paybacks": paybacks.map { $0.dictionary },
 			"uniqueId": uniqueId

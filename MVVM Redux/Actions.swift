@@ -9,47 +9,47 @@
 import Foundation
 
 
-func presentAddPaybackScreen(inout state: State) {
+func presentAddPaybackScreen(_ state: inout State) {
 	state.navigationState.viewControllerStack.append(.DetailViewController)
 	state.detailState = DetailState()
 }
 
-func deletePayback(index index: Int) -> (inout state: State) -> Void {
+func deletePayback(index: Int) -> (_ state: inout State) -> Void {
 	return { state in
 		state.paybackCollection.removeAtIndex(index)
 	}
 }
 
 // MARK: Detail View Actions
-func cancelAddPayback(inout state: State) {
-	state.navigationState.viewControllerStack.popLast()
+func cancelAddPayback(_ state: inout State) {
+	_ = state.navigationState.viewControllerStack.popLast()
 	state.detailState = nil
 }
 
-func setCurrentFirstResponder(responderField: DetailState.ResponderField) -> (inout state: State) -> Void {
+func setCurrentFirstResponder(_ responderField: DetailState.ResponderField) -> (_ state: inout State) -> Void {
 	return { state in
 		state.detailState?.currentFirstResponder = responderField
 	}
 }
 
-func update(responderField responderField: DetailState.ResponderField, text: String) -> (inout state: State) -> Void {
+func update(responderField: DetailState.ResponderField, text: String) -> (_ state: inout State) -> Void {
 	return { state in
-		state.detailState?.updateField(.NameField, text: text)
+		state.detailState?.updateField(.nameField, text: text)
 	}
 }
 
-func setNextResponder(inout state: State) {
+func setNextResponder(_ state: inout State) {
 	if let currentFirstResponder = state.detailState?.currentFirstResponder {
 		switch currentFirstResponder {
-		case .NameField:
-			state.detailState?.currentFirstResponder = .AmountField
-		case .AmountField:
+		case .nameField:
+			state.detailState?.currentFirstResponder = .amountField
+		case .amountField:
 			state.detailState?.currentFirstResponder = nil
 		}
 	}
 }
 
-func savePayback(inout state: State) {
+func savePayback(_ state: inout State) {
 	if state.detailState!.nameFieldValid == false {
 		state.navigationState.shouldDisplayAlert = Alert(message: "Name field invalid.")
 	}
@@ -58,15 +58,15 @@ func savePayback(inout state: State) {
 	}
 	else {
 		if let detailState = state.detailState {
-			let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joinWithSeparator(" ")
+			let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joined(separator: " ")
 			let lastName = detailState.nameComponents.last!
 			let amount = (detailState.amountField as NSString).doubleValue
 			state.paybackCollection.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
-			state.navigationState.viewControllerStack.popLast()
+			_ = state.navigationState.viewControllerStack.popLast()
 		}
 	}
 }
 
-func exitedErrorAlert(inout state: State) {
+func exitedErrorAlert(_ state: inout State) {
 	state.navigationState.shouldDisplayAlert = nil
 }

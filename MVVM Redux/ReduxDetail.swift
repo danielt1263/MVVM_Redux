@@ -12,8 +12,8 @@ import BasicRedux
 struct DetailState {
 	
     enum ResponderField: Int {
-		case NameField = 0
-		case AmountField = 1
+		case nameField = 0
+		case amountField = 1
 	}
 	
 	var currentFirstResponder: ResponderField?
@@ -34,14 +34,14 @@ struct DetailState {
 	}
 
 	var nameComponents: [String] {
-		return nameField.componentsSeparatedByString(" ").filter { !$0.isEmpty }
+		return nameField.components(separatedBy: " ").filter { !$0.isEmpty }
 	}
 
-	mutating func updateField(responderField: ResponderField, text: String?) {
+	mutating func updateField(_ responderField: ResponderField, text: String?) {
 		switch responderField {
-		case .NameField:
+		case .nameField:
 			nameField = text ?? ""
-		case .AmountField:
+		case .amountField:
 			amountField = text ?? ""
 		}
 	}
@@ -60,11 +60,11 @@ extension DetailState {
 	
 	var dictionary: [String: AnyObject] {
 		var result: [String: AnyObject] = [
-			"nameField": nameField,
-			"amountField": amountField
+			"nameField": nameField as AnyObject,
+			"amountField": amountField as AnyObject
 		]
 		if let responder = currentFirstResponder {
-			result["currentFirstResponder"] = responder.rawValue
+			result["currentFirstResponder"] = responder.rawValue as AnyObject?
 		}
 		return result
 	}
