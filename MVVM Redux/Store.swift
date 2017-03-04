@@ -41,10 +41,9 @@ extension State {
 	}
 }
 
+let mainStore = Store(initial: createState(), reducer: reducer, middleware: [logStateMiddleware])
 
-let mainStore = Store(state: createState(), middleware: [logStateMiddleware])
-
-typealias MainStore = Store<State>
+typealias MainStore = Store<State, Action>
 
 func createState() -> State {
 	let url = applicationDocumentsDirectory.appendingPathComponent("state.plist")

@@ -10,7 +10,7 @@ import UIKit
 import BasicRedux
 
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, Observer {
 
 	@IBOutlet weak var cancelBarButtonItem: UIBarButtonItem!
 	@IBOutlet weak var doneBarButtonItem: UIBarButtonItem!
@@ -20,42 +20,40 @@ class DetailViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		unsubscribe = mainStore.subscribe { [weak self] state in
-			self?.updateWithState(state)
-		}
+		mainStore.subscribe(observer: self)
 	}
 
 	@IBAction func cancelAction(_ sender: UIBarButtonItem) {
-		mainStore.dispatch(cancelAddPayback)
+		mainStore.dispatch(action: .cancelAddPayback)
 	}
 
 	@IBAction func nameFieldDidBegin(_ sender: AnyObject) {
 		guard !programaticallyBecomingFirstResponder else { return }
-		mainStore.dispatch(setCurrentFirstResponder(.nameField))
+		mainStore.dispatch(action: .setCurrentFirstResponder(responderField: .nameField))
 	}
 
 	@IBAction func nameFieldChanged(_ sender: UITextField) {
-		mainStore.dispatch(update(responderField: .nameField, text: sender.text ?? ""))
+		mainStore.dispatch(action: .update(responderField: .nameField, text: sender.text ?? ""))
 	}
 
 	@IBAction func didEndOnExit(_: AnyObject) {
-		mainStore.dispatch(setNextResponder)
+		mainStore.dispatch(action: .setNextResponder)
 	}
 
 	@IBAction func amountFieldDidBegin(_ sender: UITextField) {
 		guard !programaticallyBecomingFirstResponder else { return }
-		mainStore.dispatch(setCurrentFirstResponder(.amountField))
+		mainStore.dispatch(action: .setCurrentFirstResponder(responderField: .amountField))
 	}
 
 	@IBAction func amountFieldChanged(_ sender: UITextField) {
-		mainStore.dispatch(update(responderField: .amountField, text: sender.text ?? ""))
+		mainStore.dispatch(action: .update(responderField: .amountField, text: sender.text ?? ""))
 	}
 
 	@IBAction func doneAction(_ sender: UIBarButtonItem) {
-		mainStore.dispatch(savePayback)
+		mainStore.dispatch(action: .savePayback)
 	}
 
-	fileprivate func updateWithState(_ state: State) {
+	func handle(state: State) {
 		guard let detailState = state.detailState else { return }
 
 		nameField.text = detailState.nameField
@@ -74,8 +72,7 @@ class DetailViewController: UIViewController {
 		programaticallyBecomingFirstResponder = false
 	}
 
-	fileprivate var unsubscribe: Unsubscriber?
-	fileprivate var programaticallyBecomingFirstResponder = false
+	private var programaticallyBecomingFirstResponder = false
 
 }
 

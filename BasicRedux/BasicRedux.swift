@@ -6,67 +6,72 @@
 //
 
 
-open class Store<State> {
+public protocol Observer: class {
+	associatedtype State
+	func handle(state: State)
+}
+
+public final class Store<State, Action> {
+	public typealias Reducer = (State, Action) -> State
+	public typealias Dispatcher =  (Action) -> Void
+	public typealias Middleware = (@escaping Dispatcher, @escaping () -> State) -> Dispatcher
 	
-	public typealias Action = (_ state: inout State) -> Void
-	public typealias Observer = (_ state: State) -> Void
-	public typealias Dispatcher = (_ action: Action) -> Void
-	public typealias Middleware = (_ next: @escaping Dispatcher, _ state: @escaping () -> State) -> Dispatcher
-	
-	public init(state: State, middleware: [Middleware] = []) {
-		currentState = state
+	public init(initial state: State, reducer: @escaping Reducer, middleware: [Middleware] = []) {
+		self.state = state
+		reduce = reducer
 		dispatcher = middleware.reversed().reduce(self._dispatch) { (dispatcher: @escaping Dispatcher, middleware: Middleware) -> Dispatcher in
-			middleware(dispatcher, { self.currentState })
+			middleware(dispatcher, { self.state })
 		}
 	}
 	
-	open func dispatch(_ action: Action) {
+	public func dispatch(action: Action) {
 		guard !isDispatching else { fatalError("Cannot dispatch in the middle of a dispatch") }
 		isDispatching = true
 		self.dispatcher(action)
 		isDispatching = false
 	}
 	
-	open func subscribe(_ observer: @escaping Observer) -> Unsubscriber {
+	public func subscribe<O: Observer>(observer: O) where O.State == State {
+		for locus in subscribers {
+			if locus.value.element == nil {
+				subscribers.removeValue(forKey: locus.key)
+			}
+		}
 		let id = uniqueId
 		uniqueId += 1
-		subscribers[id] = observer
-		let dispose = { [weak self] () -> Void in
-			_ = self?.subscribers.removeValue(forKey: id)
-		}
-		observer(currentState)
-		return Unsubscriber(method: dispose)
+		subscribers[id] = Entry(element: AnyObserver(observer))
+		observer.handle(state: state)
 	}
 	
-	fileprivate func _dispatch(_ action: Action) {
-		action(&currentState)
-		for subscriber in subscribers.values {
-			subscriber(currentState)
+	private func _dispatch(action: Action) {
+		state = reduce(state, action)
+		for subscriber in subscribers.values.flatMap({ $0.element }) {
+			subscriber.handle(state: state)
 		}
 	}
 	
-	fileprivate var isDispatching = false
-	fileprivate var currentState: State
-	fileprivate var uniqueId = 0
-	fileprivate var subscribers: [Int: Observer] = [:]
-	fileprivate var dispatcher: Dispatcher = { _ in }
+	private let reduce: Reducer
+	private var state: State
+	private var isDispatching = false
+	private var uniqueId = 0
+	private var subscribers: [Int: Entry<AnyObserver<State>>] = [:]
+	private var dispatcher: Dispatcher = { _ in fatalError() }
 }
 
-open class Unsubscriber {
-	fileprivate var method: (() -> Void)?
-
-	init(method: @escaping () -> Void) {
-		self.method = method
+private class AnyObserver<T>: Observer {
+	typealias State = T
+	init<O: Observer>(_ observer: O) where O.State == State {
+		_handle = observer.handle
 	}
-
-	deinit {
-		unsubscribe()
+	
+	func handle(state: T) {
+		_handle(state)
 	}
+	
+	private let _handle: (State) -> Void
+}
 
-	open func unsubscribe() {
-		if let method = method {
-			method()
-		}
-		method = nil
-	}
+private struct Entry<T> where T: AnyObject {
+	typealias Element = T
+	weak var element: Element?
 }

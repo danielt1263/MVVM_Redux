@@ -10,16 +10,14 @@ import UIKit
 import BasicRedux
 
 
-class MasterTableViewController: UITableViewController {
+class MasterTableViewController: UITableViewController, Observer {
 	
 	@IBOutlet weak var addBarButtonItem: UIBarButtonItem!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		navigationItem.rightBarButtonItem = editButtonItem
-		unsubscribe = mainStore.subscribe { [weak self] state in
-			self?.updateWithState(state)
-		}
+		mainStore.subscribe(observer: self)
 	}
 	
 	// MARK: - Table view data source
@@ -39,15 +37,15 @@ class MasterTableViewController: UITableViewController {
 
 	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
 		if editingStyle == .delete {
-			mainStore.dispatch(deletePayback(index: indexPath.row))
+			mainStore.dispatch(action: .deletePayback(index: indexPath.row))
 		}
 	}
 
 	@IBAction func addAction(_ sender: AnyObject) {
-		mainStore.dispatch(presentAddPaybackScreen)
+		mainStore.dispatch(action: .presentAddPaybackScreen)
 	}
 	
-	fileprivate func updateWithState(_ state: State) {
+	func handle(state: State) {
 		let newItems = state.paybackCollection.paybacks
 		var arrayCompare = ArrayCompare<Payback>()
 		arrayCompare.old = items
@@ -67,8 +65,7 @@ class MasterTableViewController: UITableViewController {
 		tableView.endUpdates()
 	}
 
-	fileprivate var unsubscribe: Unsubscriber?
-	fileprivate var items: [Payback] = []
+	private var items: [Payback] = []
 
 }
 

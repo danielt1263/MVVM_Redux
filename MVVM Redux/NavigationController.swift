@@ -10,7 +10,7 @@ import UIKit
 import BasicRedux
 
 
-class NavigationController: UINavigationController {
+class NavigationController: UINavigationController, Observer {
 
 	override func loadView() {
 		super.loadView()
@@ -20,16 +20,14 @@ class NavigationController: UINavigationController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		unsubscribe = mainStore.subscribe { [weak self] state in
-			self?.updateWithState(state)
-		}
+		mainStore.subscribe(observer: self)
 	}
 	
 	func undo() {
 		
 	}
 	
-	fileprivate func updateWithState(_ state: State) {
+	func handle(state: State) {
 		let navState = state.navigationState
 		let currentStackCount = childViewControllers.count
 		if currentStackCount > navState.viewControllerStack.count {
@@ -64,15 +62,14 @@ class NavigationController: UINavigationController {
 		}
 	}
 
-	fileprivate func displayErrorAlert(_ message: String) {
+	private func displayErrorAlert(_ message: String) {
 		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "OK", style: .cancel) { _ in
-			mainStore.dispatch(exitedErrorAlert)
+			mainStore.dispatch(action: .exitedErrorAlert)
 		})
 		present(alert, animated: true, completion: nil)
 	}
 	
-	fileprivate var unsubscribe: Unsubscriber?
 }
 
 
