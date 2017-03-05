@@ -2,7 +2,7 @@
 //  Redux.swift
 //
 //  Created by Daniel Tartaglia on 01/16/15.
-//  Copyright © 2016. MIT License.
+//  Copyright © 2017. MIT License.
 //
 
 
@@ -13,7 +13,7 @@ public protocol Observer: class {
 
 public final class Store<State, Action> {
 	public typealias Reducer = (State, Action) -> State
-	public typealias Dispatcher =  (Action) -> Void
+	public typealias Dispatcher = (Action) -> Void
 	public typealias Middleware = (@escaping Dispatcher, @escaping () -> State) -> Dispatcher
 	
 	public init(initial state: State, reducer: @escaping Reducer, middleware: [Middleware] = []) {
@@ -32,20 +32,21 @@ public final class Store<State, Action> {
 	}
 	
 	public func subscribe<O: Observer>(observer: O) where O.State == State {
-		for locus in subscribers {
-			if locus.value.element == nil {
-				subscribers.removeValue(forKey: locus.key)
-			}
-		}
 		let id = uniqueId
 		uniqueId += 1
-		subscribers[id] = Entry(element: AnyObserver(observer))
+		subscribers[id] = AnyObserver(observer)
 		observer.handle(state: state)
+	}
+	
+	public func unsubscribe<O: Observer>(observer: O) where O.State == State {
+		for subscriber in subscribers.filter({ $0.value === observer }) {
+			subscribers.removeValue(forKey: subscriber.key)
+		}
 	}
 	
 	private func _dispatch(action: Action) {
 		state = reduce(state, action)
-		for subscriber in subscribers.values.flatMap({ $0.element }) {
+		for subscriber in subscribers.values {
 			subscriber.handle(state: state)
 		}
 	}
@@ -54,7 +55,7 @@ public final class Store<State, Action> {
 	private var state: State
 	private var isDispatching = false
 	private var uniqueId = 0
-	private var subscribers: [Int: Entry<AnyObserver<State>>] = [:]
+	private var subscribers: [Int: AnyObserver<State>] = [:]
 	private var dispatcher: Dispatcher = { _ in fatalError() }
 }
 

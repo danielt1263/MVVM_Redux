@@ -144,6 +144,16 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
+		72BF5E811E6B7E460039796B /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				722FE66B1C51C72100107118 /* Navigation */,
+				722FE66C1C51C73500107118 /* Master */,
+				722FE66D1C51C73D00107118 /* Detail */,
+			);
+			name = "View Controllers";
+			sourceTree = "<group>";
+		};
 		72C7D2141C49E7B100A88A65 = {
 			isa = PBXGroup;
 			children = (
@@ -168,9 +178,7 @@
 			isa = PBXGroup;
 			children = (
 				722FE66E1C51C78D00107118 /* Model */,
-				722FE66B1C51C72100107118 /* Navigation */,
-				722FE66C1C51C73500107118 /* Master */,
-				722FE66D1C51C73D00107118 /* Detail */,
+				72BF5E811E6B7E460039796B /* View Controllers */,
 				72C7D2201C49E7B200A88A65 /* AppDelegate.swift */,
 				72C7D2241C49E7B200A88A65 /* Main.storyboard */,
 				72C7D2271C49E7B200A88A65 /* Assets.xcassets */,

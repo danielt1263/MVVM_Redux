@@ -18,11 +18,16 @@ class DetailViewController: UIViewController, Observer {
 	@IBOutlet weak var amountField: UITextField!
 	@IBOutlet weak var resultLabel: UILabel!
 
-	override func viewDidLoad() {
-		super.viewDidLoad()
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
 		mainStore.subscribe(observer: self)
 	}
-
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		mainStore.unsubscribe(observer: self)
+		super.viewDidDisappear(animated)
+	}
+	
 	@IBAction func cancelAction(_ sender: UIBarButtonItem) {
 		mainStore.dispatch(action: .cancelAddPayback)
 	}

@@ -27,6 +27,10 @@ func reducer(state: State, action: Action) -> State {
 	newState.paybackCollection = paybackReducer(state: state.paybackCollection, action: action)
 	
 	switch action {
+	case .presentAddPaybackScreen:
+		newState.detailState = DetailState()
+		newState.navigationState.viewControllerStack.append(.DetailViewController)
+		
 	case .savePayback:
 		if state.detailState!.nameFieldValid == false {
 			newState.navigationState.shouldDisplayAlert = Alert(message: "Name field invalid.")
@@ -43,9 +47,11 @@ func reducer(state: State, action: Action) -> State {
 				_ = newState.navigationState.viewControllerStack.popLast()
 			}
 		}
+
 	case .cancelAddPayback:
 		newState.detailState = nil
 		_ = newState.navigationState.viewControllerStack.popLast()
+	
 	default:
 		break
 	}
@@ -55,12 +61,12 @@ func reducer(state: State, action: Action) -> State {
 func detailReducer(state: DetailState?, action: Action) -> DetailState? {
 	var newState = state
 	switch action {
-	case .presentAddPaybackScreen:
-		newState = DetailState()
 	case .setCurrentFirstResponder(let responderField):
 		newState?.currentFirstResponder = responderField
+	
 	case .update(let (responderField, text)):
 		newState?.updateField(responderField, text: text)
+	
 	case .setNextResponder:
 		if let currentFirstResponder = state?.currentFirstResponder {
 			switch currentFirstResponder {
@@ -70,6 +76,7 @@ func detailReducer(state: DetailState?, action: Action) -> DetailState? {
 				newState?.currentFirstResponder = nil
 			}
 		}
+	
 	default:
 		break
 	}
@@ -79,10 +86,9 @@ func detailReducer(state: DetailState?, action: Action) -> DetailState? {
 func navigationReducer(state: NavigationState, action: Action) -> NavigationState {
 	var newState = state
 	switch action {
-	case .presentAddPaybackScreen:
-		newState.viewControllerStack.append(.DetailViewController)
 	case .exitedErrorAlert:
 		newState.shouldDisplayAlert = nil
+	
 	default:
 		break
 	}
@@ -94,6 +100,7 @@ func paybackReducer(state: PaybackCollection, action: Action) -> PaybackCollecti
 	switch action {
 	case .deletePayback(let index):
 		newState.removeAtIndex(index)
+	
 	default:
 		break
 	}

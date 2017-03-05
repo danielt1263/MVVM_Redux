@@ -17,7 +17,16 @@ class MasterTableViewController: UITableViewController, Observer {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		navigationItem.rightBarButtonItem = editButtonItem
+	}
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
 		mainStore.subscribe(observer: self)
+	}
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		mainStore.unsubscribe(observer: self)
+		super.viewDidDisappear(animated)
 	}
 	
 	// MARK: - Table view data source

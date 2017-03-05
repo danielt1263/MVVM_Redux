@@ -18,9 +18,14 @@ class NavigationController: UINavigationController, Observer {
 		setToolbarItems([undoButton], animated: false)
 	}
 	
-	override func viewDidLoad() {
-		super.viewDidLoad()
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
 		mainStore.subscribe(observer: self)
+	}
+	
+	override func viewDidDisappear(_ animated: Bool) {
+		mainStore.unsubscribe(observer: self)
+		super.viewDidDisappear(animated)
 	}
 	
 	func undo() {
