@@ -19,7 +19,7 @@ public final class Store<State, Action> {
 	public init(initial state: State, reducer: @escaping Reducer, middleware: [Middleware] = []) {
 		self.state = state
 		reduce = reducer
-		dispatcher = middleware.reversed().reduce(self._dispatch) { (dispatcher: @escaping Dispatcher, middleware: Middleware) -> Dispatcher in
+		dispatcher = middleware.reversed().reduce(self._dispatch) { dispatcher, middleware in
 			middleware(dispatcher, { self.state })
 		}
 	}
@@ -32,21 +32,19 @@ public final class Store<State, Action> {
 	}
 	
 	public func subscribe<O: Observer>(observer: O) where O.State == State {
-		let id = uniqueId
-		uniqueId += 1
-		subscribers[id] = AnyObserver(observer)
+		subscribers.append(AnyObserver(observer))
 		observer.handle(state: state)
 	}
 	
 	public func unsubscribe<O: Observer>(observer: O) where O.State == State {
-		for subscriber in subscribers.filter({ $0.value === observer }) {
-			subscribers.removeValue(forKey: subscriber.key)
+		while let index = subscribers.index(where: { $0 === observer }) {
+			subscribers.remove(at: index)
 		}
 	}
 	
 	private func _dispatch(action: Action) {
 		state = reduce(state, action)
-		for subscriber in subscribers.values {
+		for subscriber in subscribers {
 			subscriber.handle(state: state)
 		}
 	}
@@ -54,8 +52,7 @@ public final class Store<State, Action> {
 	private let reduce: Reducer
 	private var state: State
 	private var isDispatching = false
-	private var uniqueId = 0
-	private var subscribers: [Int: AnyObserver<State>] = [:]
+	private var subscribers: [AnyObserver<State>] = []
 	private var dispatcher: Dispatcher = { _ in fatalError() }
 }
 
@@ -70,9 +67,4 @@ private class AnyObserver<T>: Observer {
 	}
 	
 	private let _handle: (State) -> Void
-}
-
-private struct Entry<T> where T: AnyObject {
-	typealias Element = T
-	weak var element: Element?
 }
