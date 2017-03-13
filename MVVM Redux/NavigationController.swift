@@ -29,7 +29,7 @@ class NavigationController: UINavigationController {
 		
 	}
 	
-	fileprivate func updateWithState(_ state: State) {
+	private func updateWithState(_ state: State) {
 		let navState = state.navigationState
 		let currentStackCount = childViewControllers.count
 		if currentStackCount > navState.viewControllerStack.count {
@@ -64,7 +64,7 @@ class NavigationController: UINavigationController {
 		}
 	}
 
-	fileprivate func displayErrorAlert(_ message: String) {
+	private func displayErrorAlert(_ message: String) {
 		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "OK", style: .cancel) { _ in
 			mainStore.dispatch(exitedErrorAlert)
@@ -72,7 +72,7 @@ class NavigationController: UINavigationController {
 		present(alert, animated: true, completion: nil)
 	}
 	
-	fileprivate var unsubscribe: Unsubscriber?
+	private var unsubscribe: Unsubscriber?
 }
 
 

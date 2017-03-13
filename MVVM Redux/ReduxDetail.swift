@@ -15,7 +15,15 @@ struct DetailState {
 		case nameField = 0
 		case amountField = 1
 	}
-	
+
+	init(presenting payback: Payback? = nil) {
+		self.payback = payback
+		guard let payback = payback else { return }
+		self.nameField = "\(payback.firstName) \(payback.lastName)"
+		self.amountField = String(payback.amount)
+	}
+
+	var payback: Payback?
 	var currentFirstResponder: ResponderField?
 	var nameField: String = ""
 	var amountField: String = ""

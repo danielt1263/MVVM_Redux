@@ -43,11 +43,15 @@ class MasterTableViewController: UITableViewController {
 		}
 	}
 
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		mainStore.dispatch(presentEditPaybackScreen(index: indexPath.row))
+	}
+
 	@IBAction func addAction(_ sender: AnyObject) {
 		mainStore.dispatch(presentAddPaybackScreen)
 	}
 	
-	fileprivate func updateWithState(_ state: State) {
+	private func updateWithState(_ state: State) {
 		let newItems = state.paybackCollection.paybacks
 		var arrayCompare = ArrayCompare<Payback>()
 		arrayCompare.old = items
@@ -67,8 +71,8 @@ class MasterTableViewController: UITableViewController {
 		tableView.endUpdates()
 	}
 
-	fileprivate var unsubscribe: Unsubscriber?
-	fileprivate var items: [Payback] = []
+	private var unsubscribe: Unsubscriber?
+	private var items: [Payback] = []
 
 }
 

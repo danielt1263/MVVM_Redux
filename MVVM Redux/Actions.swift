@@ -14,7 +14,14 @@ func presentAddPaybackScreen(_ state: inout State) {
 	state.detailState = DetailState()
 }
 
-func deletePayback(index: Int) -> (_ state: inout State) -> Void {
+func presentEditPaybackScreen(index: Int) -> MainStore.Action {
+	return { state in
+		state.navigationState.viewControllerStack.append(.DetailViewController)
+		state.detailState = DetailState(presenting: state.paybackCollection.paybacks[index])
+	}
+}
+
+func deletePayback(index: Int) -> MainStore.Action {
 	return { state in
 		state.paybackCollection.removeAtIndex(index)
 	}
@@ -34,7 +41,7 @@ func setCurrentFirstResponder(_ responderField: DetailState.ResponderField) -> (
 
 func update(responderField: DetailState.ResponderField, text: String) -> (_ state: inout State) -> Void {
 	return { state in
-		state.detailState?.updateField(.nameField, text: text)
+		state.detailState?.updateField(responderField, text: text)
 	}
 }
 
@@ -50,20 +57,25 @@ func setNextResponder(_ state: inout State) {
 }
 
 func savePayback(_ state: inout State) {
-	if state.detailState!.nameFieldValid == false {
+	guard let detailState = state.detailState else { return }
+	if detailState.nameFieldValid == false {
 		state.navigationState.shouldDisplayAlert = Alert(message: "Name field invalid.")
 	}
-	else if state.detailState!.amountFieldValid == false {
+	else if detailState.amountFieldValid == false {
 		state.navigationState.shouldDisplayAlert = Alert(message: "Amount field invalid.")
 	}
 	else {
-		if let detailState = state.detailState {
-			let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joined(separator: " ")
-			let lastName = detailState.nameComponents.last!
-			let amount = (detailState.amountField as NSString).doubleValue
-			state.paybackCollection.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
-			_ = state.navigationState.viewControllerStack.popLast()
+		let firstName = Array(detailState.nameComponents[0 ..< (detailState.nameComponents.count - 1)]).joined(separator: " ")
+		let lastName = detailState.nameComponents.last!
+		let amount = (detailState.amountField as NSString).doubleValue
+		if let paybackID = detailState.payback?.id {
+			let paybackIndex = state.paybackCollection.paybacks.index(where: {$0.id == paybackID })!
+			state.paybackCollection.paybacks[paybackIndex] = Payback(id: paybackID, firstName: firstName, lastName: lastName, amount: amount)
 		}
+		else {
+			state.paybackCollection.addPaybackWithFirstName(firstName, lastName: lastName, amount: amount)
+		}
+		_ = state.navigationState.viewControllerStack.popLast()
 	}
 }
 

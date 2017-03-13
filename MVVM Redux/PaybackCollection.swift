@@ -9,7 +9,7 @@
 
 struct PaybackCollection {
 	
-	fileprivate (set) var paybacks: [Payback] = []
+	var paybacks: [Payback] = []
 	
 	mutating func addPaybackWithFirstName(_ firstName: String, lastName: String, amount: Double) {
 		let id = uniqueId

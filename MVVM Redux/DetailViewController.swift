@@ -55,7 +55,7 @@ class DetailViewController: UIViewController {
 		mainStore.dispatch(savePayback)
 	}
 
-	fileprivate func updateWithState(_ state: State) {
+	private func updateWithState(_ state: State) {
 		guard let detailState = state.detailState else { return }
 
 		nameField.text = detailState.nameField
@@ -74,8 +74,8 @@ class DetailViewController: UIViewController {
 		programaticallyBecomingFirstResponder = false
 	}
 
-	fileprivate var unsubscribe: Unsubscriber?
-	fileprivate var programaticallyBecomingFirstResponder = false
+	private var unsubscribe: Unsubscriber?
+	private var programaticallyBecomingFirstResponder = false
 
 }
 

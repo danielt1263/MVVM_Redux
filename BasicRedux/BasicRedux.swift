@@ -6,7 +6,14 @@
 //
 
 
-open class Store<State> {
+public protocol Dispatcher {
+	associatedtype State
+	typealias Action = (_ state: inout State) -> Void
+	func dispatch(_ action: Action)
+}
+
+public final
+class Store<State>: Dispatcher {
 	
 	public typealias Action = (_ state: inout State) -> Void
 	public typealias Observer = (_ state: State) -> Void
@@ -20,14 +27,14 @@ open class Store<State> {
 		}
 	}
 	
-	open func dispatch(_ action: Action) {
+	public func dispatch(_ action: Action) {
 		guard !isDispatching else { fatalError("Cannot dispatch in the middle of a dispatch") }
 		isDispatching = true
 		self.dispatcher(action)
 		isDispatching = false
 	}
 	
-	open func subscribe(_ observer: @escaping Observer) -> Unsubscriber {
+	public func subscribe(_ observer: @escaping Observer) -> Unsubscriber {
 		let id = uniqueId
 		uniqueId += 1
 		subscribers[id] = observer
@@ -38,22 +45,23 @@ open class Store<State> {
 		return Unsubscriber(method: dispose)
 	}
 	
-	fileprivate func _dispatch(_ action: Action) {
+	private func _dispatch(_ action: Action) {
 		action(&currentState)
 		for subscriber in subscribers.values {
 			subscriber(currentState)
 		}
 	}
 	
-	fileprivate var isDispatching = false
-	fileprivate var currentState: State
-	fileprivate var uniqueId = 0
-	fileprivate var subscribers: [Int: Observer] = [:]
-	fileprivate var dispatcher: Dispatcher = { _ in }
+	private var isDispatching = false
+	private var currentState: State
+	private var uniqueId = 0
+	private var subscribers: [Int: Observer] = [:]
+	private var dispatcher: Dispatcher = { _ in }
 }
 
-open class Unsubscriber {
-	fileprivate var method: (() -> Void)?
+public final
+class Unsubscriber {
+	private var method: (() -> Void)?
 
 	init(method: @escaping () -> Void) {
 		self.method = method
@@ -63,7 +71,7 @@ open class Unsubscriber {
 		unsubscribe()
 	}
 
-	open func unsubscribe() {
+	func unsubscribe() {
 		if let method = method {
 			method()
 		}

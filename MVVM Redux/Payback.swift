@@ -41,5 +41,8 @@ extension Payback {
 }
 
 func ==(lhs: Payback, rhs: Payback) -> Bool {
-	return lhs.id == rhs.id
+	return lhs.id == rhs.id &&
+		lhs.firstName == rhs.firstName &&
+		lhs.lastName == rhs.lastName &&
+		lhs.amount == rhs.amount
 }
