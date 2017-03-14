@@ -29,7 +29,7 @@ func reducer(state: State, action: Action) -> State {
 	switch action {
 	case .presentAddPaybackScreen:
 		newState.detailState = DetailState()
-		newState.navigationState.viewControllerStack.append(.DetailViewController)
+		newState.navigationState.viewControllerStack.append(.detailViewController)
 		
 	case .savePayback:
 		if state.detailState!.nameFieldValid == false {
@@ -65,7 +65,12 @@ func detailReducer(state: DetailState?, action: Action) -> DetailState? {
 		newState?.currentFirstResponder = responderField
 	
 	case .update(let (responderField, text)):
-		newState?.updateField(responderField, text: text)
+		switch responderField {
+		case .nameField:
+			newState?.name = text
+		case .amountField:
+			newState?.amountField = text
+		}
 	
 	case .setNextResponder:
 		if let currentFirstResponder = state?.currentFirstResponder {

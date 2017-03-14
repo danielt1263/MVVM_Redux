@@ -61,7 +61,7 @@ class DetailViewController: UIViewController, Observer {
 	func handle(state: State) {
 		guard let detailState = state.detailState else { return }
 
-		nameField.text = detailState.nameField
+		nameField.text = detailState.name
 		amountField.text = detailState.amountField
 		resultLabel.text = detailState.label
 

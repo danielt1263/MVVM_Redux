@@ -17,11 +17,11 @@ struct DetailState {
 	}
 	
 	var currentFirstResponder: ResponderField?
-	var nameField: String = ""
+	var name: String = ""
 	var amountField: String = ""
 	
 	var label: String {
-		return nameField + "\n" + amountField
+		return name + "\n" + amountField
 	}
 	
 	var nameFieldValid: Bool {
@@ -29,24 +29,16 @@ struct DetailState {
 	}
 	
 	var amountFieldValid: Bool {
-		let value = (amountField as NSString).doubleValue
+		let value = Double(amountField) ?? 0.0
 		return value.isNormal && value > 0
 	}
 
 	var nameComponents: [String] {
-		return nameField.components(separatedBy: " ").filter { !$0.isEmpty }
-	}
-
-	mutating func updateField(_ responderField: ResponderField, text: String?) {
-		switch responderField {
-		case .nameField:
-			nameField = text ?? ""
-		case .amountField:
-			amountField = text ?? ""
-		}
+		return name.components(separatedBy: " ").filter { !$0.isEmpty }
 	}
 
 }
+
 
 extension DetailState {
     
@@ -54,13 +46,13 @@ extension DetailState {
 		if let responder = dictionary["currentFirstResponder"] as? Int {
 			currentFirstResponder = ResponderField(rawValue: responder)
 		}
-        nameField = dictionary["nameField"] as! String
+        name = dictionary["nameField"] as! String
         amountField = dictionary["amountField"] as! String
     }
 	
 	var dictionary: [String: AnyObject] {
 		var result: [String: AnyObject] = [
-			"nameField": nameField as AnyObject,
+			"nameField": name as AnyObject,
 			"amountField": amountField as AnyObject
 		]
 		if let responder = currentFirstResponder {

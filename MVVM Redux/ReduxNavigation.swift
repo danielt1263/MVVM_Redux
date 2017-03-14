@@ -11,7 +11,7 @@ import BasicRedux
 
 struct NavigationState {
 	
-	var viewControllerStack = [ViewController.MasterTableViewController]
+	var viewControllerStack = [ViewController.masterTableViewController]
 	var shouldDisplayAlert: Alert?
     
 }
@@ -58,6 +58,6 @@ extension Alert {
 
 
 enum ViewController: String {
-	case MasterTableViewController = "MasterTableViewController"
-	case DetailViewController = "DetailViewController"	
+	case masterTableViewController = "MasterTableViewController"
+	case detailViewController = "DetailViewController"
 }
