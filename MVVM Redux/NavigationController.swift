@@ -10,7 +10,7 @@ import UIKit
 import BasicRedux
 
 
-class NavigationController: UINavigationController, Observer {
+class NavigationController: UINavigationController {
 
 	override func loadView() {
 		super.loadView()
@@ -20,37 +20,31 @@ class NavigationController: UINavigationController, Observer {
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		mainStore.subscribe(observer: self)
-	}
-	
-	override func viewDidDisappear(_ animated: Bool) {
-		mainStore.unsubscribe(observer: self)
-		super.viewDidDisappear(animated)
+		unsubscriber = mainStore.subscribe(observer: { [weak self] in self?.handle(state: $0.navigationState) })
 	}
 	
 	func undo() {
 		
 	}
 	
-	func handle(state: State) {
-		let navState = state.navigationState
+	func handle(state: NavigationState) {
 		let currentStackCount = childViewControllers.count
-		if currentStackCount > navState.viewControllerStack.count {
-			for _ in 0..<(currentStackCount - navState.viewControllerStack.count) {
+		if currentStackCount > state.viewControllerStack.count {
+			for _ in 0..<(currentStackCount - state.viewControllerStack.count) {
 				popViewController(animated: true)
 			}
 		}
-		else if currentStackCount < navState.viewControllerStack.count {
-			for vc in navState.viewControllerStack[currentStackCount ..< navState.viewControllerStack.count] {
+		else if currentStackCount < state.viewControllerStack.count {
+			for vc in state.viewControllerStack[currentStackCount ..< state.viewControllerStack.count] {
 				let controller = storyboard!.instantiateViewController(withIdentifier: vc.rawValue)
 				pushViewController(controller, animated: true)
 			}
 		}
-		else if navState.viewControllerStack.last?.rawValue != childViewControllers.last?.restorationIdentifier {
+		else if state.viewControllerStack.last?.rawValue != childViewControllers.last?.restorationIdentifier {
 			fatalError("NOT HANDLED: Attempted to go back and forward down different path")
 		}
 		
-		if let alert = state.navigationState.shouldDisplayAlert {
+		if let alert = state.shouldDisplayAlert {
 			if let presentedAlert = presentedViewController as? UIAlertController {
 				if alert.message != presentedAlert.message {
 					fatalError("NOT HANDLED: Attempted to present alert on an alert")
@@ -66,6 +60,8 @@ class NavigationController: UINavigationController, Observer {
 			}
 		}
 	}
+
+	private var unsubscriber: Unsubscriber?
 
 	private func displayErrorAlert(_ message: String) {
 		let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)

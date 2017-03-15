@@ -10,7 +10,7 @@ import UIKit
 import BasicRedux
 
 
-class MasterTableViewController: UITableViewController, Observer {
+class MasterTableViewController: UITableViewController {
 	
 	@IBOutlet weak var addBarButtonItem: UIBarButtonItem!
 
@@ -21,12 +21,7 @@ class MasterTableViewController: UITableViewController, Observer {
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		mainStore.subscribe(observer: self)
-	}
-	
-	override func viewDidDisappear(_ animated: Bool) {
-		mainStore.unsubscribe(observer: self)
-		super.viewDidDisappear(animated)
+		unsubscriber = mainStore.subscribe(observer: { [weak self] in self?.handle(newItems: $0.paybackCollection.paybacks) })
 	}
 	
 	// MARK: - Table view data source
@@ -54,8 +49,7 @@ class MasterTableViewController: UITableViewController, Observer {
 		mainStore.dispatch(action: .presentAddPaybackScreen)
 	}
 	
-	func handle(state: State) {
-		let newItems = state.paybackCollection.paybacks
+	func handle(newItems: [Payback]) {
 		var arrayCompare = ArrayCompare<Payback>()
 		arrayCompare.old = items
 		arrayCompare.new = newItems
@@ -68,12 +62,13 @@ class MasterTableViewController: UITableViewController, Observer {
 		arrayCompare.moveBlock = { _, from, to in
 			self.tableView.moveRow(at: IndexPath(row: from, section: 0), to: IndexPath(row: to, section: 0))
 		}
-		items = newItems
 		tableView.beginUpdates()
 		arrayCompare.run()
+		items = newItems
 		tableView.endUpdates()
 	}
 
+	private var unsubscriber: Unsubscriber?
 	private var items: [Payback] = []
 
 }

@@ -10,7 +10,7 @@ import UIKit
 import BasicRedux
 
 
-class DetailViewController: UIViewController, Observer {
+class DetailViewController: UIViewController {
 
 	@IBOutlet weak var cancelBarButtonItem: UIBarButtonItem!
 	@IBOutlet weak var doneBarButtonItem: UIBarButtonItem!
@@ -20,12 +20,7 @@ class DetailViewController: UIViewController, Observer {
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		mainStore.subscribe(observer: self)
-	}
-	
-	override func viewDidDisappear(_ animated: Bool) {
-		mainStore.unsubscribe(observer: self)
-		super.viewDidDisappear(animated)
+		unsubscriber = mainStore.subscribe(observer: { [weak self] in self?.handle(state: $0) }, lens: { $0.detailState })
 	}
 	
 	@IBAction func cancelAction(_ sender: UIBarButtonItem) {
@@ -58,15 +53,15 @@ class DetailViewController: UIViewController, Observer {
 		mainStore.dispatch(action: .savePayback)
 	}
 
-	func handle(state: State) {
-		guard let detailState = state.detailState else { return }
+	func handle(state: DetailState?) {
+		guard let state = state else { return }
 
-		nameField.text = detailState.name
-		amountField.text = detailState.amountField
-		resultLabel.text = detailState.label
+		nameField.text = state.name
+		amountField.text = state.amountField
+		resultLabel.text = state.label
 
 		programaticallyBecomingFirstResponder = true
-		switch detailState.currentFirstResponder {
+		switch state.currentFirstResponder {
 		case .some(.nameField):
 			nameField.becomeFirstResponder()
 		case .some(.amountField):
@@ -78,6 +73,7 @@ class DetailViewController: UIViewController, Observer {
 	}
 
 	private var programaticallyBecomingFirstResponder = false
+	private var unsubscriber: Unsubscriber?
 
 }
 
