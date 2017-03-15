@@ -22,10 +22,7 @@ enum Action {
 
 func reducer(state: State, action: Action) -> State {
 	var newState = state
-	newState.detailState = detailReducer(state: state.detailState, action: action)
-	newState.navigationState = navigationReducer(state: state.navigationState, action: action)
-	newState.paybackCollection = paybackReducer(state: state.paybackCollection, action: action)
-	
+
 	switch action {
 	case .presentAddPaybackScreen:
 		newState.detailState = DetailState()
@@ -53,7 +50,9 @@ func reducer(state: State, action: Action) -> State {
 		_ = newState.navigationState.viewControllerStack.popLast()
 	
 	default:
-		break
+		newState.detailState = detailReducer(state: state.detailState, action: action)
+		newState.navigationState = navigationReducer(state: state.navigationState, action: action)
+		newState.paybackCollection = paybackReducer(state: state.paybackCollection, action: action)
 	}
 	return newState
 }
